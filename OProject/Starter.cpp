@@ -24,6 +24,8 @@ bool wIsDown = false;
 bool sIsDown = false;
 bool aIsDown = false;
 bool dIsDown = false;
+bool jumping = false;
+GLfloat jump = 0.0;
 
 //För musen...
 Point3D p = vec3(0, 5, 8);
@@ -33,7 +35,7 @@ Point3D temp;
 Point3D temp2;
 Point3D temp3;
 Point3D camUp = vec3(0,1,0);
-GLfloat screenX = 600.0;
+GLfloat screenX = 800.0;
 GLfloat screenY = 600.0;
 GLfloat oldx = 0;
 GLfloat oldy = 0;
@@ -285,6 +287,9 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
 		case 'q':
 			exit(0);
 		break;
+		case ' ':
+			jumping = true;
+		break;
 		default:
          break;
 	}
@@ -307,6 +312,28 @@ void keyboardUpFunction (unsigned char key, int xmouse, int ymouse)
 		case 'd':
 			dIsDown = false;
 		break; 
+		default:
+         break;
+	}
+
+}
+
+void keyboardSpecFunction (int key, int xmouse, int ymouse)
+{	
+	switch (key){
+		
+
+		default:
+         break;
+	}
+	
+}
+
+
+void keyboardSpecUpFunction (int key, int xmouse, int ymouse)
+{	
+	switch (key){
+		
 		default:
          break;
 	}
@@ -342,7 +369,8 @@ void init(void)
 
 	GLenum err = glewInit();
 
-	glutReshapeWindow(screenX,screenY);
+	//glutReshapeWindow(screenX,screenY);
+	  glutFullScreen();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
 	Point3D up = vec3(0.0f, 1.0f, 0.0f);
@@ -388,16 +416,16 @@ void display(void)
 {
 	if(wIsDown)
 	{
-		temp = VectorSub(l, p);
+			temp = VectorSub(l, p);
 			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
+			temp = ScalarMult(temp, 0.3f);
 			p = VectorAdd(temp, p);
 			l = VectorAdd(temp, l);	
 	}
 	if(sIsDown){
 			temp = VectorSub(p, l);
 			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
+			temp = ScalarMult(temp, 0.3f);
 			p = VectorAdd(temp, p);
 			l = VectorAdd(temp, l);
 	}
@@ -405,7 +433,7 @@ void display(void)
 			temp = VectorSub(p, l);	
 			temp = CrossProduct(temp, camUp); 
 			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
+			temp = ScalarMult(temp, 0.3f);
 			p = VectorAdd(temp, p);
 			l = VectorAdd(temp, l);
 	}
@@ -413,13 +441,13 @@ void display(void)
 			temp = VectorSub(p, l);	
 			temp = CrossProduct(camUp, temp); 
 			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
+			temp = ScalarMult(temp, 0.3f);
 			p = VectorAdd(temp, p);
 			l = VectorAdd(temp, l);
 	}
 
-	//l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 1.0;
-	//p.y = findHeight(p.x,p.z, &ttex) +1.0;
+	l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 2.0 + jump;
+	p.y = findHeight(p.x,p.z, &ttex) + 2.0  + jump;
 
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -475,6 +503,18 @@ void display(void)
 void timer(int i)
 {
 	glutTimerFunc(20, &timer, i);
+	if(jumping && jump <= 3.5){
+		jump += 0.3;
+		if(jump >= 3.5){
+			jumping = false;
+		}
+	}
+	if(!jumping && jump>0.0){
+		jump-=0.3;
+		if(jump<0.0){
+			jump=0.0;
+		}
+	}
 	glutPostRedisplay();
 }
 
@@ -489,6 +529,8 @@ int main(int argc, char *argv[])
 	
 	glutKeyboardFunc(keyboardFunction);
 	glutKeyboardUpFunc(keyboardUpFunction);
+	glutSpecialFunc(keyboardSpecFunction);
+	glutSpecialUpFunc(keyboardSpecUpFunction);
 	glutPassiveMotionFunc(mouse);
 	glutTimerFunc(20, &timer, 0);
 	glutMainLoop();
