@@ -21,6 +21,9 @@ mat4 camMatrix;
 
 //För keyboard
 bool wIsDown = false;
+bool sIsDown = false;
+bool aIsDown = false;
+bool dIsDown = false;
 
 //För musen...
 Point3D p = vec3(0, 5, 8);
@@ -268,41 +271,20 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
 {	
 	switch (key){
 		case 'w':
-			/*temp = VectorSub(l, p);
-			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
-			p = VectorAdd(temp, p);
-			l = VectorAdd(temp, l);			*/
 			wIsDown = true;
 		break;
 		case 's':
-			temp = VectorSub(p, l);
-			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
-			p = VectorAdd(temp, p);
-			l = VectorAdd(temp, l);
+			sIsDown = true;
 		break;
 		case 'a':
-			temp = VectorSub(p, l);	
-			temp = CrossProduct(temp, camUp); 
-			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
-			p = VectorAdd(temp, p);
-			l = VectorAdd(temp, l);
+			aIsDown = true;
 		break;
 		case 'd':
-			temp = VectorSub(p, l);	
-			temp = CrossProduct(camUp, temp); 
-			temp = Normalize(temp);
-			temp = ScalarMult(temp, 0.5f);
-			p = VectorAdd(temp, p);
-			l = VectorAdd(temp, l);
-		break;
- 
+			dIsDown = true;
+		break;	 
 		case 'q':
 			exit(0);
 		break;
-
 		default:
          break;
 	}
@@ -313,14 +295,20 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
 void keyboardUpFunction (unsigned char key, int xmouse, int ymouse)
 {	
 	switch (key){
-	case 'w':
-
-		wIsDown = false;
+		case 'w':
+			wIsDown = false;
 		break;
-
-	default:
-        break;
-
+		case 's':
+			sIsDown = false;
+		break;
+		case 'a':
+			aIsDown = false;
+		break;
+		case 'd':
+			dIsDown = false;
+		break; 
+		default:
+         break;
 	}
 }
 
@@ -405,6 +393,29 @@ void display(void)
 			temp = ScalarMult(temp, 0.5f);
 			p = VectorAdd(temp, p);
 			l = VectorAdd(temp, l);	
+	}
+	if(sIsDown){
+			temp = VectorSub(p, l);
+			temp = Normalize(temp);
+			temp = ScalarMult(temp, 0.5f);
+			p = VectorAdd(temp, p);
+			l = VectorAdd(temp, l);
+	}
+	if(aIsDown){
+			temp = VectorSub(p, l);	
+			temp = CrossProduct(temp, camUp); 
+			temp = Normalize(temp);
+			temp = ScalarMult(temp, 0.5f);
+			p = VectorAdd(temp, p);
+			l = VectorAdd(temp, l);
+	}
+	if(dIsDown){
+			temp = VectorSub(p, l);	
+			temp = CrossProduct(camUp, temp); 
+			temp = Normalize(temp);
+			temp = ScalarMult(temp, 0.5f);
+			p = VectorAdd(temp, p);
+			l = VectorAdd(temp, l);
 	}
 
 	//l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 1.0;
