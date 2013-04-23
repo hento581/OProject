@@ -19,6 +19,9 @@ mat4 projectionMatrix;
 
 mat4 camMatrix;
 
+//För keyboard
+bool wIsDown = false;
+
 //För musen...
 Point3D p = vec3(0, 5, 8);
 Point3D l = vec3(2, 0, 2);
@@ -265,11 +268,12 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
 {	
 	switch (key){
 		case 'w':
-			temp = VectorSub(l, p);
+			/*temp = VectorSub(l, p);
 			temp = Normalize(temp);
 			temp = ScalarMult(temp, 0.5f);
 			p = VectorAdd(temp, p);
-			l = VectorAdd(temp, l);			
+			l = VectorAdd(temp, l);			*/
+			wIsDown = true;
 		break;
 		case 's':
 			temp = VectorSub(p, l);
@@ -303,6 +307,21 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
          break;
 	}
 	
+}
+
+
+void keyboardUpFunction (unsigned char key, int xmouse, int ymouse)
+{	
+	switch (key){
+	case 'w':
+
+		wIsDown = false;
+		break;
+
+	default:
+        break;
+
+	}
 }
 
 
@@ -379,6 +398,15 @@ void init(void)
 
 void display(void)
 {
+	if(wIsDown)
+	{
+		temp = VectorSub(l, p);
+			temp = Normalize(temp);
+			temp = ScalarMult(temp, 0.5f);
+			p = VectorAdd(temp, p);
+			l = VectorAdd(temp, l);	
+	}
+
 	//l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 1.0;
 	//p.y = findHeight(p.x,p.z, &ttex) +1.0;
 
@@ -447,8 +475,10 @@ int main(int argc, char *argv[])
 	glutDisplayFunc(display); 
 	
 	init();
-	glutTimerFunc(20, &timer, 0);
+	
 	glutKeyboardFunc(keyboardFunction);
+	glutKeyboardUpFunc(keyboardUpFunction);
 	glutPassiveMotionFunc(mouse);
+	glutTimerFunc(20, &timer, 0);
 	glutMainLoop();
 }
