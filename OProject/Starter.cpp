@@ -22,6 +22,7 @@ mat4 camMatrix;
 //För musen...
 Point3D p = vec3(0, 5, 8);
 Point3D l = vec3(2, 0, 2);
+Point3D test;
 Point3D temp;
 Point3D temp2;
 Point3D temp3;
