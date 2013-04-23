@@ -25,3 +25,5 @@ _ReSharper*/
 *.ilk
 *.pdb
 *.tlog
+*.vcxproj
+*.filters
