@@ -32,10 +32,13 @@ GLfloat jump = 0.0;
 //För gravitation
 GLfloat lastHeight = -999.0;
 GLfloat gravSpeed = 0.3;
+GLfloat gravitation = 0.0982/100.0;
+GLfloat inAirTime = 0.0;
+bool inAir = false;
 
 //För jump
 bool jumping = false;
-GLfloat jumpSpeed = 0.6;
+GLfloat jumpSpeed = 1.0/5.0;
 GLfloat jumpTime = 0.0;
 GLfloat maxJumpTime = 15.0;
 
@@ -301,6 +304,10 @@ void keyboardFunction (unsigned char key, int xmouse, int ymouse)
 		break;
 		case ' ':
 			jumping = true;
+			if(!inAir){
+				inAir =true;
+				inAirTime=0.0;
+			}
 		break;
 		default:
          break;
@@ -465,18 +472,28 @@ void display(void)
 	}
 	GLfloat groundHeight = findHeight(p.x,p.z, &ttex) + 2.0;
 	GLfloat newHeight = lastHeight;
-	if(jumping){
-		newHeight = lastHeight-gravSpeed+jumpSpeed;
+	if(newHeight > groundHeight && !inAir){
+		inAirTime = 0.0;
+		inAir = true;
 	}
-	else{
-		newHeight = lastHeight-gravSpeed;
+	
+	if(inAir){
+		if(jumping){
+			//jumpSpeed = -gravitation*jumpTime*jumpTime/2+jumpSpeed*jumpTime;
+			newHeight = lastHeight-gravitation*inAirTime*inAirTime/2+jumpSpeed;
+		}
+		else{
+			newHeight = lastHeight-gravitation*inAirTime*inAirTime/2;
+		}
 	}
-	if(newHeight > groundHeight){
+	if(newHeight <= groundHeight) inAir=false;
+	if(inAir){
 		l.y = l.y - p.y + newHeight;
 		p.y = newHeight;
 		
 	} 
 	else{
+		inAir=false;
 			l.y = l.y - p.y + groundHeight;
 			p.y = groundHeight;
 			
@@ -539,18 +556,6 @@ void display(void)
 void timer(int i)
 {
 	glutTimerFunc(20, &timer, i);
-	/*if(jumping){
-		jump += 0.3;
-		if(jump >= 5.5){
-			jumping = false;
-		}
-	}
-	if(!jumping && jump>0.0){
-		jump-=0.3;
-		if(jump<0.0){
-			jump=0.0;
-		}
-	}*/
 	if(jumping){
 		if(jumpTime<maxJumpTime){
 			jumpTime+=1.0;
@@ -560,6 +565,7 @@ void timer(int i)
 			jumpTime=0.0;
 		}
 	}
+	inAirTime+=1.0;
 	glutPostRedisplay();
 }
 
