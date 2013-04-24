@@ -24,8 +24,20 @@ bool wIsDown = false;
 bool sIsDown = false;
 bool aIsDown = false;
 bool dIsDown = false;
-bool jumping = false;
+
+
+
 GLfloat jump = 0.0;
+
+//För gravitation
+GLfloat lastHeight = -999.0;
+GLfloat gravSpeed = 0.3;
+
+//För jump
+bool jumping = false;
+GLfloat jumpSpeed = 0.6;
+GLfloat jumpTime = 0.0;
+GLfloat maxJumpTime = 15.0;
 
 //För musen...
 Point3D p = vec3(0, 5, 8);
@@ -370,7 +382,7 @@ void init(void)
 	GLenum err = glewInit();
 
 	//glutReshapeWindow(screenX,screenY);
-	  glutFullScreen();
+	 glutFullScreen();
 	glutSetCursor(GLUT_CURSOR_NONE);
 
 	Point3D up = vec3(0.0f, 1.0f, 0.0f);
@@ -446,8 +458,32 @@ void display(void)
 			l = VectorAdd(temp, l);
 	}
 
-	l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 2.0 + jump;
-	p.y = findHeight(p.x,p.z, &ttex) + 2.0  + jump;
+	if(lastHeight == -999.0){
+		l.y = l.y - p.y + findHeight(p.x,p.z, &ttex) + 2.0;
+		p.y = findHeight(p.x,p.z, &ttex) + 2.0;
+		lastHeight = p.y;
+	}
+	GLfloat groundHeight = findHeight(p.x,p.z, &ttex) + 2.0;
+	GLfloat newHeight = lastHeight;
+	if(jumping){
+		newHeight = lastHeight-gravSpeed+jumpSpeed;
+	}
+	else{
+		newHeight = lastHeight-gravSpeed;
+	}
+	if(newHeight > groundHeight){
+		l.y = l.y - p.y + newHeight;
+		p.y = newHeight;
+		
+	} 
+	else{
+			l.y = l.y - p.y + groundHeight;
+			p.y = groundHeight;
+			
+	}
+	lastHeight = p.y;
+	
+	
 
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -503,9 +539,9 @@ void display(void)
 void timer(int i)
 {
 	glutTimerFunc(20, &timer, i);
-	if(jumping && jump <= 3.5){
+	/*if(jumping){
 		jump += 0.3;
-		if(jump >= 3.5){
+		if(jump >= 5.5){
 			jumping = false;
 		}
 	}
@@ -513,6 +549,15 @@ void timer(int i)
 		jump-=0.3;
 		if(jump<0.0){
 			jump=0.0;
+		}
+	}*/
+	if(jumping){
+		if(jumpTime<maxJumpTime){
+			jumpTime+=1.0;
+		}
+		else{
+			jumping=false;
+			jumpTime=0.0;
 		}
 	}
 	glutPostRedisplay();
